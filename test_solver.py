@@ -4,34 +4,182 @@ Tests for solver.py
 
 import solver
 
+words = ['women', 'death', 'abyss']
+mixedcase_words = ['wOmen', 'DeatH', 'ABYSS']
+spaceandcase_words = ['W O M E N', 'd e A tH', 'a b y s s']
+fake_words = ['aaaaa', 'abcde', 'greip']
+fake_spaceandcase_words = ['AAAAA', 'aBCdE', 'G re ip']
 
-def test_fetchWordList():
+
+def test_fetch_wordlist():
     """
     Test that word list is fetched correctly.
     """
-    solverInstance = solver.WordleSolver()
-    wordlist = solverInstance.master_wordlist
-    assert ('women' in wordlist)
-    assert ('abyss' in wordlist)
-    assert ('death' in wordlist)
+    solver_instance = solver.WordleSolver()
+    wordlist = solver_instance.master_wordlist
+
+    for word in words:
+        assert (word in wordlist)
+
+    for word in fake_words:
+        assert (word not in wordlist)
 
 
-def test_autoSolver():
+def test_sanitise_word():
     """
-    Test that the program can play against itself.
+    Test that words are correctly converted to 5 letter lowercase
+    or are rejected.
     """
-    solverInstance = solver.WordleSolver()
-    print(solverInstance.true_word)
-    print(solverInstance.true_num_letters)
+    solver_instance = solver.WordleSolver()
 
-    success = False
-    while success is False:
-        guess = solverInstance.suggestGuess()
-        print(guess)
-        success = solverInstance.processGuess(guess)
+    for word in words:
+        assert (solver_instance.sanitise_word(word) == word)
 
-    assert (success is True)
+    for word, test_word in zip(words, mixedcase_words):
+        assert (solver_instance.sanitise_word(test_word) == word)
+
+    for word, test_word in zip(words, spaceandcase_words):
+        assert (solver_instance.sanitise_word(test_word) == word)
+
+    for word in fake_words:
+        try:
+            solver_instance.sanitise_word(word)
+            raise AssertionError
+        except ValueError:
+            pass
+
+    for word in fake_spaceandcase_words:
+        try:
+            solver_instance.sanitise_word(word)
+            raise AssertionError
+        except ValueError:
+            pass
 
 
-test_fetchWordList()
-test_autoSolver()
+def test_output_word():
+    """
+    Test that
+    """
+
+    solver_instance = solver.WordleSolver()
+
+
+def test_set_true_word():
+    """
+    Test that the true word is only set to valid inputs.
+    """
+    solver_instance = solver.WordleSolver()
+
+    for word in words:
+        solver_instance = solver.WordleSolver()
+        solver_instance.set_true_word(word)
+        assert (solver_instance.true_word == word)
+
+    for word, test_word in zip(words, mixedcase_words):
+        solver_instance = solver.WordleSolver()
+        solver_instance.set_true_word(test_word)
+        assert (solver_instance.true_word == word)
+
+    for word, test_word in zip(words, spaceandcase_words):
+        solver_instance = solver.WordleSolver()
+        solver_instance.set_true_word(test_word)
+        assert (solver_instance.true_word == word)
+
+    for word in fake_words:
+        solver_instance = solver.WordleSolver()
+        solver_instance.set_true_word(word)
+        assert (solver_instance.true_word != word)
+
+    for word in fake_spaceandcase_words:
+        solver_instance = solver.WordleSolver()
+        solver_instance.set_true_word(word)
+        assert (solver_instance.true_word != word)
+
+
+def test_process_guess():
+    """
+    Test that only words in the wordle list are able to be used as guesses
+    and that they are removed from the viable wordlist.
+
+    This also tests the eliminate_nonviable_words method.
+    """
+
+    for word in words:
+        solver_instance = solver.WordleSolver()
+        solver_instance.process_guess(word)
+        assert (word not in solver_instance.viable_wordlist)
+
+    for word, test_word in zip(words, mixedcase_words):
+        solver_instance = solver.WordleSolver()
+        solver_instance.process_guess(test_word)
+        assert (word not in solver_instance.viable_wordlist)
+
+    for word, test_word in zip(words, spaceandcase_words):
+        solver_instance = solver.WordleSolver()
+        solver_instance.process_guess(test_word)
+        assert (word not in solver_instance.viable_wordlist)
+
+    for word in fake_words:
+        try:
+            solver_instance = solver.WordleSolver()
+            solver_instance.process_guess(word)
+            raise AssertionError
+        except ValueError:
+            pass
+
+    for word in fake_spaceandcase_words:
+        try:
+            solver_instance = solver.WordleSolver()
+            solver_instance.process_guess(word)
+            raise AssertionError
+        except ValueError:
+            pass
+
+
+def test_suggest_random_guess():
+    '''
+    Test that suggest random words are valid and viable.
+    '''
+
+    solver_instance = solver.WordleSolver(true_word='green')
+
+    # Check that the random words are in the master list
+    for i in range(10000):
+        guess = solver_instance.suggest_random_guess()
+        assert(guess in solver_instance.master_wordlist)
+
+    # Check that the random words are viable after some have been
+    # eliminated from a guess
+    solver_instance.process_guess('grape')
+    for i in range(10000):
+        guess = solver_instance.suggest_random_guess()
+        assert(guess in solver_instance.viable_wordlist)
+
+
+def test_suggest_eliminator_guess():
+    '''
+    Test that suggested guesses are valid and viable.
+    '''
+
+    solver_instance = solver.WordleSolver(true_word='green')
+
+    # Check that the suggested guesses are in the master list
+    for i in range(10000):
+        guess = solver_instance.suggest_eliminator_guess()
+        assert(guess in solver_instance.master_wordlist)
+
+    # Check that the suggested guesses are viable after some have been
+    # eliminated from a guess, but only if force_viable is set
+    solver_instance.process_guess('grape')
+    for i in range(10000):
+        guess = solver_instance.suggest_eliminator_guess(force_viable=True)
+        assert(guess in solver_instance.viable_wordlist)
+
+
+def test_suggest_default_first_guess():
+    '''
+    Check that the default suggested guess is valid and viable.
+    '''
+    solver_instance = solver.WordleSolver()
+    guess = solver_instance.suggest_default_first_guess()
+    assert(guess == solver_instance.sanitise_word(guess))

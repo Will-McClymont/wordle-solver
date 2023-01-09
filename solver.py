@@ -57,14 +57,14 @@ class WordleSolver():
             random_index = np.random.randint(number_of_words)
             self.true_word = self.master_wordlist[random_index]
 
-        elif true_word in self.master_wordlist:
-            self.true_word = true_word
-
         else:
-            print('Input true word not valid. Setting random master word.')
-            number_of_words = len(self.master_wordlist)
-            random_index = np.random.randit(number_of_words)
-            self.true_word = self.master_wordlist[random_index]
+            try:
+                self.true_word = self.sanitise_word(true_word)
+            except ValueError:
+                print('Input true word not valid. Setting random true word.')
+                number_of_words = len(self.master_wordlist)
+                random_index = np.random.randint(number_of_words)
+                self.true_word = self.master_wordlist[random_index]
 
         self.true_num_letters = np.zeros(26, dtype=int)
         for i, letter in enumerate(self.true_word):
@@ -90,14 +90,15 @@ class WordleSolver():
     def process_guess(self, guess):
 
         # Check that the guess is a valid word
-        if guess not in self.master_wordlist:
-            print('Guess was not a valid 5 letter word. Guess not processed.')
-            return False
-        else:
-            self.num_attempts += 1
+        try:
+            guess = self.sanitise_word(guess)
+        except ValueError:
+            raise ValueError(f'{guess} is not a valid 5 letter word. Guess not processed.')
+
+        self.num_attempts += 1
 
         # Check if the guess is correct
-        if guess is self.true_word:
+        if guess == self.true_word:
             print(
                 f'You have successfully guessed the word after {self.num_attempts} attempts!')
             return True
@@ -136,8 +137,6 @@ class WordleSolver():
                                                   self.minnum_letters),
                                        self.minnum_letters)
 
-        print(self.minnum_letters)
-        print(self.maxnum_letters)
         self.eliminate_nonviable_words()
 
         return False
@@ -203,9 +202,6 @@ class WordleSolver():
         wordlist_scores = np.sum(
             wordlist_binary_letters * letter_freq_list, axis=1)
         highest_scoring_index = np.argmax(wordlist_scores)
-        print(np.shape(wordlist_scores))
-        print(highest_scoring_index)
-        print(len(self.viable_wordlist))
 
         if force_viable:
             return self.viable_wordlist[highest_scoring_index]
