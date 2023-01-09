@@ -3,6 +3,11 @@ Main solver module.
 """
 
 import numpy as np
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
+
+colorama_init()
 
 
 class WordleSolver():
@@ -32,10 +37,12 @@ class WordleSolver():
         sanitised_word = sanitised_word.lower()
 
         if len(sanitised_word) != 5:
-            raise ValueError(f'Unable to convert {word} to a five letter lowercase word.')
+            raise ValueError(
+                f'Unable to convert {word} to a five letter lowercase word.')
 
         if sanitised_word not in self.master_wordlist:
-            raise ValueError(f'Input word \'{word}\' is not in the Wordle dictionary.')
+            raise ValueError(
+                f'Input word \'{word}\' is not in the Wordle dictionary.')
 
         return sanitised_word
 
@@ -44,6 +51,26 @@ class WordleSolver():
         Converts an all lower case word to all caps and provides a list of
         values corresponding to the letter colour.
         '''
+        output_string = ""
+
+        running_num_letters = np.zeros(26, dtype=int)
+        for i, letter in enumerate(word):
+            index = ord(letter) - ord('a')
+            if letter == self.true_word[i]:
+                output_string = (f'{output_string}{Fore.CYAN}'
+                                 f'{letter.upper()}{Style.RESET_ALL}')
+                continue
+            elif self.true_num_letters[index] > running_num_letters[index]:
+                running_num_letters[index] += 1
+                output_string = (f'{output_string}{Fore.YELLOW}'
+                                 f'{letter.upper()}{Style.RESET_ALL}')
+                continue
+            elif self.true_num_letters[index] == running_num_letters[index]:
+                output_string = (f'{output_string}{Fore.RED}'
+                                 f'{letter.upper()}{Style.RESET_ALL}')
+                continue
+
+        return output_string
 
     def set_true_word(self, true_word):
         '''
@@ -88,14 +115,21 @@ class WordleSolver():
         self.wordlist_num_letters = np.copy(self.master_wordlist_num_letters)
 
     def process_guess(self, guess):
+        '''
+        Takes an input guess, checks its validity, and updates the class
+        attributes with new information from that guess, e.g. removing
+        nonviable words from the viable_words list.
+        '''
 
         # Check that the guess is a valid word
         try:
             guess = self.sanitise_word(guess)
         except ValueError:
-            raise ValueError(f'{guess} is not a valid 5 letter word. Guess not processed.')
+            raise ValueError(
+                f'{guess} is not a valid 5 letter word. Guess not processed.')
 
         self.num_attempts += 1
+        print(self.output_word(guess))
 
         # Check if the guess is correct
         if guess == self.true_word:
@@ -142,6 +176,12 @@ class WordleSolver():
         return False
 
     def eliminate_nonviable_words(self):
+        '''
+        Eliminates words which are no longer valid given the restrictions from
+        the current knowledge. The current knowledge is stored in the
+        minnum_letter, maxnumletters, known_letters, and known_falseletters
+        attributes.
+        '''
 
         for i, word in enumerate(list(self.viable_wordlist)):
             # Check that the word doesn't violate known letter numbers
@@ -169,6 +209,9 @@ class WordleSolver():
                 self.wordlist_num_letters[i, ord(letter) - ord('a')] += 1
 
     def suggest_random_guess(self):
+        '''
+        Suggests a random word from the viable_wordlist attribute.
+        '''
         number_of_words = len(self.viable_wordlist)
         random_index = np.random.randint(number_of_words)
         return self.viable_wordlist[random_index]
