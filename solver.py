@@ -1,5 +1,6 @@
 """
-Main solver module.
+This module is the core of the Wordle solver program. The
+main feature is the WordleSolver class.
 """
 
 import numpy as np
@@ -17,6 +18,22 @@ class WordleSolver():
                  true_word=None,
                  suppress_info=False
                  ):
+        '''
+        Initialise the solver. Set attributes to their default values,
+        attempt to set the true_word and fetch the wordlist.
+
+        Parameters
+        ----------
+        wordlist_path: str
+            the path for the wordlist.
+        true_word: str
+            the input word to be set as the answer for the Wordle.
+            must be a valid 5 letter word, otherwise a random word
+            is set.
+        suppress_info: boolean
+            if set to true, will stop most information from being printed.
+            can be useful if solving many words in batch.
+        '''
         self.wordlist_path = wordlist_path
         self.fetch_word_list()
         self.viable_wordlist = self.master_wordlist[:]
@@ -34,6 +51,15 @@ class WordleSolver():
         '''
         Sanitises an input word by removing spaces and converting to lower
         case.
+        Parameters
+        ----------
+        word: str
+            the input word to be sanitised
+
+        Returns
+        ----------
+        sanitised_word: str
+            the sanitised word as a five letter lowercase string
         '''
         sanitised_word = word.replace(" ", "")
         sanitised_word = sanitised_word.lower()
@@ -50,9 +76,23 @@ class WordleSolver():
 
     def output_word(self, word):
         '''
-        Converts an all lower case word to all caps and provides a list of
-        values corresponding to the letter colour.
+        Converts an all lower case word to all caps and includes codes to
+        show as coloured text when printed.
+
+        Parameters
+        ----------
+        word: str
+            the input word to be converted to output format.
+
+        Returns
+        ----------
+        output_string: str
+            the word in output format, suitable to be sent to print
+            in colour.
         '''
+
+        word = self.sanitise_word(word)
+
         output_string = ""
 
         running_num_letters = np.zeros(26, dtype=int)
@@ -79,6 +119,13 @@ class WordleSolver():
         Sets the true_word attribute to the true_word provided.
         Sets to a random word on the master list if true_word is None or
         invalid.
+
+        Parameters
+        ----------
+        word: str
+            the input word to be set as the answer for the Wordle.
+            must be a valid 5 letter word, otherwise a random word
+            is set.
         '''
 
         if true_word is None:
@@ -124,6 +171,17 @@ class WordleSolver():
         Takes an input guess, checks its validity, and updates the class
         attributes with new information from that guess, e.g. removing
         nonviable words from the viable_words list.
+
+        Parameters
+        ----------
+        guess: str
+            the input word to be processed as a guess.
+            must be a valid five letter word.
+
+        Returns
+        ----------
+        boolean
+            whether or not the guess is correct
         '''
 
         # Check that the guess is a valid word
@@ -194,9 +252,9 @@ class WordleSolver():
 
         for i, word in enumerate(list(self.viable_wordlist)):
             # Check that the word doesn't violate known letter numbers
-            # THIS NEEDS TO BE DFIXED TO USE VIABLEWORDLIST_NUM_LETTERS
             if (np.any(self.wordlist_num_letters[i, :] < self.minnum_letters)
-                    or np.any(self.wordlist_num_letters[i, :] > self.maxnum_letters)):
+                    or np.any(self.wordlist_num_letters[i, :]
+                              > self.maxnum_letters)):
                 self.viable_wordlist.remove(word)
                 continue
 
@@ -232,8 +290,9 @@ class WordleSolver():
         Suggest a guess to eliminate as many common letters as possible.
 
         parameters:
-        force_viable - Set to true in order to only select words that may still
-                       be the correct word.
+        force_viable: boolean
+            Set to true in order to only select words that may still
+            be the correct word.
         '''
 
         # Score number of words in which each letter appears

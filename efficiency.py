@@ -7,12 +7,13 @@ from tqdm import tqdm
 
 solver_instance = solver.WordleSolver()
 
-step = 20
+step = 1
 wordlist = solver_instance.master_wordlist[::step]
 
 method_name = 'Flagship'
-#method_name = 'Random'
-#method_name = 'Eliminator'
+# method_name = 'Random'
+# method_name = 'Eliminator'
+
 num_attempts = np.zeros(len(wordlist), dtype=int)
 
 for i, word in enumerate(tqdm(wordlist)):

@@ -56,14 +56,6 @@ def test_sanitise_word():
             pass
 
 
-def test_output_word():
-    """
-    Test that
-    """
-
-    solver_instance = solver.WordleSolver()
-
-
 def test_set_true_word():
     """
     Test that the true word is only set to valid inputs.

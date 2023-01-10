@@ -1,9 +1,49 @@
+'''
+This module contains functions that are used in the interactive.py
+and batch.py scripts. These functions are also suitable for a user
+to incorporate into their own scripts. The functions handle the
+interation with the WordleSolver class from the solver module.
+
+Contains:
+----------------------------------------
+    random_batch_solve
+        Solves Wordle for a given true word by guessing random viable
+        words.
+    eliminator_batch_solve
+        Solves Wordle for a given true word by guessing words which will
+        eliminate many remaining viable words.
+    flagship_batch_solve
+        Solves Wordle for a given true word by guessing mainly using the
+        eliminator method, however some tweaks are used to improve
+        performance.
+    interactive_solve
+        This function is used to play Wordle interactively.
+'''
+
 import solver
 
 
 def random_batch_solve(true_word, suppress_info=False):
     '''
     Function to solve for a given true word using the random method.
+
+    Parameters
+    ----------
+    true_word: str
+        the input word to be set as the answer for the Wordle.
+        must be a valid 5 letter word, otherwise a random word
+        is set.
+    suppress_info: boolean
+        if set to true, will stop most information from being printed.
+        can be useful if solving many words in batch.
+
+    Returns
+    ----------
+    str
+        the actual true word used by the Wordle solver. Can be useful
+        in can a random true word was set due to an invalid input.
+    int
+        the number of attempts taken to solve the Wordle.
     '''
 
     solver_instance = solver.WordleSolver(true_word=true_word,
@@ -21,9 +61,27 @@ def random_batch_solve(true_word, suppress_info=False):
 
 
 def eliminator_batch_solve(true_word, suppress_info=False):
-    """
+    '''
     Function to solve for a given true word using the eliminator method.
-    """
+
+    Parameters
+    ----------
+    true_word: str
+        the input word to be set as the answer for the Wordle.
+        must be a valid 5 letter word, otherwise a random word
+        is set.
+    suppress_info: boolean
+        if set to true, will stop most information from being printed.
+        can be useful if solving many words in batch.
+
+    Returns
+    ----------
+    str
+        the actual true word used by the Wordle solver. Can be useful
+        in can a random true word was set due to an invalid input.
+    int
+        the number of attempts taken to solve the Wordle.
+    '''
     solver_instance = solver.WordleSolver(true_word=true_word,
                                           suppress_info=suppress_info)
 
@@ -40,9 +98,27 @@ def eliminator_batch_solve(true_word, suppress_info=False):
 
 
 def flagship_batch_solve(true_word, suppress_info=False):
-    """
+    '''
     Function to solve for a given true word using the best method.
-    """
+
+    Parameters
+    ----------
+    true_word: str
+        the input word to be set as the answer for the Wordle.
+        must be a valid 5 letter word, otherwise a random word
+        is set.
+    suppress_info: boolean
+        if set to true, will stop most information from being printed.
+        can be useful if solving many words in batch.
+
+    Returns
+    ----------
+    str
+        the actual true word used by the Wordle solver. Can be useful
+        in can a random true word was set due to an invalid input.
+    int
+        the number of attempts taken to solve the Wordle.
+    '''
     solver_instance = solver.WordleSolver(true_word=true_word,
                                           suppress_info=suppress_info)
 
@@ -63,9 +139,27 @@ def flagship_batch_solve(true_word, suppress_info=False):
 
 
 def interactive_solve(true_word=None, suggest=True):
-    """
+    '''
     Function to allow the user to solve interactively.
-    """
+
+    Parameters
+    ----------
+    true_word: str
+        the input word to be set as the answer for the Wordle.
+        must be a valid 5 letter word, otherwise a random word
+        is set.
+    suppress_info: boolean
+        if set to true, will stop most information from being printed.
+        can be useful if solving many words in batch.
+
+    Returns
+    ----------
+    str
+        the actual true word used by the Wordle solver. Can be useful
+        in can a random true word was set due to an invalid input.
+    int
+        the number of attempts taken to solve the Wordle.
+    '''
     solver_instance = solver.WordleSolver(true_word=true_word,
                                           suppress_info=False)
 

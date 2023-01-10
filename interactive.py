@@ -1,3 +1,8 @@
+'''
+This script can be executed from the command line with Python3 in
+order to play Wordle interactively.
+'''
+
 import userfunctions
 
 print('Would you like suggestions? (Y/N)')

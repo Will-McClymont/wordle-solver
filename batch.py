@@ -1,3 +1,9 @@
+'''
+This script can be executed from the command line with Python3 in
+order to batch solve Wordle for a given word or a randomly assigned
+word.
+'''
+
 import userfunctions
 import sys
 
