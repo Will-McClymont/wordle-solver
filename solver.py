@@ -239,9 +239,9 @@ class WordleSolver():
         # Score number of words in which each letter appears
 
         wordlist_binary_letters = np.where(self.wordlist_num_letters > 0, 1, 0)
-        letter_freq_list = np.sum(wordlist_binary_letters, axis=0)
-        letter_freq_list = np.where(self.minnum_letters >= 3,
-                                    letter_freq_list * 0.05, letter_freq_list)
+        letter_freq_list = np.sum(wordlist_binary_letters, axis=0, dtype=float)
+        letter_freq_list *= 0.01 ** self.minnum_letters
+
         letter_freq_list = np.where(self.minnum_letters == self.maxnum_letters,
                                     0, letter_freq_list)
 
@@ -253,24 +253,25 @@ class WordleSolver():
         wordlist_scores = np.sum(
             wordlist_binary_letters * letter_freq_list, axis=1)
         highest_scoring_index = np.argmax(wordlist_scores)
+        highest_scoring = wordlist_scores[highest_scoring_index]
 
         master_wordlist_scores = np.sum(
             master_wordlist_binary_letters * letter_freq_list, axis=1)
         highest_scoring_master_index = np.argmax(master_wordlist_scores)
+        highest_scoring_master = \
+            master_wordlist_scores[highest_scoring_master_index]
 
         if force_viable:
             return self.viable_wordlist[highest_scoring_index]
         elif not force_viable:
-            if master_wordlist_scores[highest_scoring_master_index] \
-                    == wordlist_scores[highest_scoring_index]:
+            if highest_scoring >= 0.99999 * highest_scoring_master:
                 return self.viable_wordlist[highest_scoring_index]
             return self.master_wordlist[highest_scoring_master_index]
 
     def suggest_default_first_guess(self):
+        '''
+        Suggest a default first guess. This is a word that is known to
+        be good at eliminating many possibilities, and likley better than
+        the guess suggested by suggest_eliminator_guess.
+        '''
         return 'salet'
-
-    def suggest_smart_guess(self):
-        '''
-        Suggest a guess from the list of viable remaining words based on a
-        criteria for which word is most likley.
-        '''
