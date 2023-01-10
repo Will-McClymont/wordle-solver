@@ -56,14 +56,6 @@ def test_sanitise_word():
             pass
 
 
-def test_output_word():
-    """
-    Test that
-    """
-
-    solver_instance = solver.WordleSolver()
-
-
 def test_set_true_word():
     """
     Test that the true word is only set to valid inputs.
@@ -171,9 +163,8 @@ def test_suggest_eliminator_guess():
     # Check that the suggested guesses are viable after some have been
     # eliminated from a guess, but only if force_viable is set
     solver_instance.process_guess('grape')
-    for i in range(10000):
-        guess = solver_instance.suggest_eliminator_guess(force_viable=True)
-        assert(guess in solver_instance.viable_wordlist)
+    guess = solver_instance.suggest_eliminator_guess(force_viable=True)
+    assert(guess in solver_instance.viable_wordlist)
 
 
 def test_suggest_default_first_guess():

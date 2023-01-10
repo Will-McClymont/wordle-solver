@@ -17,19 +17,19 @@ def test_random_batch_solve():
     """
     # Normal inputs.
     for word in words:
-        assert (userfunctions.random_batch_solve(word) == word)
+        assert (userfunctions.random_batch_solve(word)[0] == word)
 
     for word, test_word in zip(words, mixedcase_words):
-        assert (userfunctions.random_batch_solve(test_word) == word)
+        assert (userfunctions.random_batch_solve(test_word)[0] == word)
 
     for word, test_word in zip(words, spaceandcase_words):
-        assert (userfunctions.random_batch_solve(test_word) == word)
+        assert (userfunctions.random_batch_solve(test_word)[0] == word)
 
     for word in fake_words:
-        assert (userfunctions.random_batch_solve(word) != word)
+        assert (userfunctions.random_batch_solve(word)[0] != word)
 
     for word in fake_spaceandcase_words:
-        assert (userfunctions.random_batch_solve(word) != word)
+        assert (userfunctions.random_batch_solve(word)[0] != word)
 
 
 def test_eliminator_batch_solve():
@@ -38,16 +38,37 @@ def test_eliminator_batch_solve():
     """
     # Normal inputs.
     for word in words:
-        assert (userfunctions.eliminator_batch_solve(word) == word)
+        assert (userfunctions.eliminator_batch_solve(word)[0] == word)
 
     for word, test_word in zip(words, mixedcase_words):
-        assert (userfunctions.eliminator_batch_solve(test_word) == word)
+        assert (userfunctions.eliminator_batch_solve(test_word)[0] == word)
 
     for word, test_word in zip(words, spaceandcase_words):
-        assert (userfunctions.eliminator_batch_solve(test_word) == word)
+        assert (userfunctions.eliminator_batch_solve(test_word)[0] == word)
 
     for word in fake_words:
-        assert (userfunctions.eliminator_batch_solve(word) != word)
+        assert (userfunctions.eliminator_batch_solve(word)[0] != word)
 
     for word in fake_spaceandcase_words:
-        assert (userfunctions.eliminator_batch_solve(word) != word)
+        assert (userfunctions.eliminator_batch_solve(word)[0] != word)
+
+
+def test_flagship_batch_solve():
+    """
+    Test flagship batch solver works correctly.
+    """
+    # Normal inputs.
+    for word in words:
+        assert (userfunctions.flagship_batch_solve(word)[0] == word)
+
+    for word, test_word in zip(words, mixedcase_words):
+        assert (userfunctions.flagship_batch_solve(test_word)[0] == word)
+
+    for word, test_word in zip(words, spaceandcase_words):
+        assert (userfunctions.flagship_batch_solve(test_word)[0] == word)
+
+    for word in fake_words:
+        assert (userfunctions.flagship_batch_solve(word)[0] != word)
+
+    for word in fake_spaceandcase_words:
+        assert (userfunctions.flagship_batch_solve(word)[0] != word)
