@@ -14,11 +14,13 @@ class WordleSolver():
 
     def __init__(self,
                  wordlist_path=r'all_words.txt',
-                 true_word=None
+                 true_word=None,
+                 suppress_info=False
                  ):
         self.wordlist_path = wordlist_path
         self.fetch_word_list()
         self.viable_wordlist = self.master_wordlist[:]
+        self.suppress_info = suppress_info
 
         self.num_attempts = 0
         self.known_letters = ['*', '*', '*', '*', '*']
@@ -88,7 +90,9 @@ class WordleSolver():
             try:
                 self.true_word = self.sanitise_word(true_word)
             except ValueError:
-                print('Input true word not valid. Setting random true word.')
+                if not self.suppress_info:
+                    print('Input true word not valid. '
+                          'Setting random true word.')
                 number_of_words = len(self.master_wordlist)
                 random_index = np.random.randint(number_of_words)
                 self.true_word = self.master_wordlist[random_index]
@@ -105,7 +109,8 @@ class WordleSolver():
         with open(self.wordlist_path, 'r') as file:
             self.master_wordlist = [line.rstrip() for line in file]
 
-        self.master_wordlist_num_letters = np.zeros((len(self.master_wordlist), 26),
+        num_words = len(self.master_wordlist)
+        self.master_wordlist_num_letters = np.zeros((num_words, 26),
                                                     dtype=int)
         for i, word in enumerate(self.master_wordlist):
             for letter in word:
@@ -129,12 +134,16 @@ class WordleSolver():
                 f'{guess} is not a valid 5 letter word. Guess not processed.')
 
         self.num_attempts += 1
-        print(self.output_word(guess))
+
+        if not self.suppress_info:
+            print(self.output_word(guess))
 
         # Check if the guess is correct
         if guess == self.true_word:
-            print(
-                f'You have successfully guessed the word after {self.num_attempts} attempts!')
+            if not self.suppress_info:
+                print(
+                    f'You have successfully guessed the word after '
+                    f'{self.num_attempts} attempts!')
             return True
 
         guess_num_letters = np.zeros(26, dtype=int)
@@ -186,14 +195,16 @@ class WordleSolver():
         for i, word in enumerate(list(self.viable_wordlist)):
             # Check that the word doesn't violate known letter numbers
             # THIS NEEDS TO BE DFIXED TO USE VIABLEWORDLIST_NUM_LETTERS
-            if np.any(self.wordlist_num_letters[i, :] < self.minnum_letters) or np.any(self.wordlist_num_letters[i, :] > self.maxnum_letters):
+            if (np.any(self.wordlist_num_letters[i, :] < self.minnum_letters)
+                    or np.any(self.wordlist_num_letters[i, :] > self.maxnum_letters)):
                 self.viable_wordlist.remove(word)
                 continue
 
             for j, letter in enumerate(word):
 
                 # Check that the word contains the true letter, if known
-                if self.known_letters[j] != '*' and self.known_letters[j] != letter:
+                if (self.known_letters[j] != '*'
+                        and self.known_letters[j] != letter):
                     self.viable_wordlist.remove(word)
                     break
 
@@ -229,30 +240,34 @@ class WordleSolver():
 
         wordlist_binary_letters = np.where(self.wordlist_num_letters > 0, 1, 0)
         letter_freq_list = np.sum(wordlist_binary_letters, axis=0)
-        letter_freq_list = np.where(
-            self.minnum_letters > 0, 0, letter_freq_list)
-        letter_freq_list = np.where(
-            self.maxnum_letters == 0, 0, letter_freq_list)
-        letter_freq_list = np.where(
-            self.maxnum_letters == self.minnum_letters, 0, letter_freq_list)
+        letter_freq_list = np.where(self.minnum_letters >= 3,
+                                    letter_freq_list * 0.05, letter_freq_list)
+        letter_freq_list = np.where(self.minnum_letters == self.maxnum_letters,
+                                    0, letter_freq_list)
 
         # Score the wordlist by multiplying each of its letters by their
         # frequency. Double letters are only counted once.
-        if not force_viable:
-            wordlist_binary_letters = np.where(
-                self.master_wordlist_num_letters > 0, 1, 0)
+        master_wordlist_binary_letters = np.where(
+            self.master_wordlist_num_letters > 0, 1, 0)
 
         wordlist_scores = np.sum(
             wordlist_binary_letters * letter_freq_list, axis=1)
         highest_scoring_index = np.argmax(wordlist_scores)
 
+        master_wordlist_scores = np.sum(
+            master_wordlist_binary_letters * letter_freq_list, axis=1)
+        highest_scoring_master_index = np.argmax(master_wordlist_scores)
+
         if force_viable:
             return self.viable_wordlist[highest_scoring_index]
         elif not force_viable:
-            return self.master_wordlist[highest_scoring_index]
+            if master_wordlist_scores[highest_scoring_master_index] \
+                    == wordlist_scores[highest_scoring_index]:
+                return self.viable_wordlist[highest_scoring_index]
+            return self.master_wordlist[highest_scoring_master_index]
 
     def suggest_default_first_guess(self):
-        return 'shoal'
+        return 'salet'
 
     def suggest_smart_guess(self):
         '''

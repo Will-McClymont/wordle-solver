@@ -51,3 +51,27 @@ def test_eliminator_batch_solve():
 
     for word in fake_spaceandcase_words:
         assert (userfunctions.eliminator_batch_solve(word) != word)
+
+def test_flagship_batch_solve():
+    """
+    Test flagship batch solver works correctly.
+    """
+    # Normal inputs.
+    for word in words:
+        assert (userfunctions.flagship_batch_solve(word) == word)
+
+    for word, test_word in zip(words, mixedcase_words):
+        assert (userfunctions.flagship_batch_solve(test_word) == word)
+
+    for word, test_word in zip(words, spaceandcase_words):
+        assert (userfunctions.flagship_batch_solve(test_word) == word)
+
+    for word in fake_words:
+        assert (userfunctions.flagship_batch_solve(word) != word)
+
+    for word in fake_spaceandcase_words:
+        assert (userfunctions.flagship_batch_solve(word) != word)
+
+
+userfunctions.flagship_batch_solve('zebra')
+#test_flagship_batch_solve()
