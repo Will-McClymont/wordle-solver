@@ -3,6 +3,9 @@ Tests for solver.py
 """
 
 import solver
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
 
 words = ['women', 'death', 'abyss']
 mixedcase_words = ['wOmen', 'DeatH', 'ABYSS']
@@ -54,6 +57,21 @@ def test_sanitise_word():
             raise AssertionError
         except ValueError:
             pass
+
+
+def test_output_word():
+    '''
+    Test that the logic for highlighting letters works correctly.
+    '''
+    solver_instance = solver.WordleSolver()
+    solver_instance.set_true_word('shoal')
+    output = solver_instance.output_word('books')
+    desired_output = (f'{Fore.RED}B{Style.RESET_ALL}'
+                      f'{Fore.RED}O{Style.RESET_ALL}'
+                      f'{Fore.CYAN}O{Style.RESET_ALL}'
+                      f'{Fore.RED}K{Style.RESET_ALL}'
+                      f'{Fore.YELLOW}S{Style.RESET_ALL}')
+    assert(output == desired_output)
 
 
 def test_set_true_word():

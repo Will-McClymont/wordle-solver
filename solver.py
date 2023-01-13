@@ -93,24 +93,32 @@ class WordleSolver():
 
         word = self.sanitise_word(word)
 
+        letter_string_list = ["*", "*", "*", "*", "*"]
         output_string = ""
-
         running_num_letters = np.zeros(26, dtype=int)
+
+        # First highlight the green letters because they take priority
+        # e.g. in the shoal ->books
         for i, letter in enumerate(word):
             index = ord(letter) - ord('a')
             if letter == self.true_word[i]:
-                output_string = (f'{output_string}{Fore.CYAN}'
-                                 f'{letter.upper()}{Style.RESET_ALL}')
-                continue
-            elif self.true_num_letters[index] > running_num_letters[index]:
                 running_num_letters[index] += 1
-                output_string = (f'{output_string}{Fore.YELLOW}'
-                                 f'{letter.upper()}{Style.RESET_ALL}')
-                continue
-            elif self.true_num_letters[index] == running_num_letters[index]:
-                output_string = (f'{output_string}{Fore.RED}'
-                                 f'{letter.upper()}{Style.RESET_ALL}')
-                continue
+                letter_string_list[i] = (f'{Fore.CYAN}'
+                                         f'{letter.upper()}{Style.RESET_ALL}')
+
+        for i, letter in enumerate(word):
+            index = ord(letter) - ord('a')
+            if letter_string_list[i] == "*":
+                if self.true_num_letters[index] > running_num_letters[index]:
+                    running_num_letters[index] += 1
+                    letter_string_list[i] = (f'{Fore.YELLOW}{letter.upper()}'
+                                             f'{Style.RESET_ALL}')
+
+                elif (self.true_num_letters[index]
+                      == running_num_letters[index]):
+                    letter_string_list[i] = (f'{Fore.RED}{letter.upper()}'
+                                             f'{Style.RESET_ALL}')
+            output_string = f'{output_string}{letter_string_list[i]}'
 
         return output_string
 
@@ -208,7 +216,7 @@ class WordleSolver():
         # Update the lists with new knowledge from guess
         for i, letter in enumerate(guess):
             guess_num_letters[ord(letter) - ord('a')] += 1
-            if letter is self.true_word[i]:
+            if letter == self.true_word[i]:
                 self.known_letters[i] = letter
             else:
                 self.known_falseletters[i].append(letter)
