@@ -1,6 +1,8 @@
 '''
 This script can be executed from the command line with Python3 in
 order to play Wordle interactively.
+
+    >>> python3 interactive.py
 '''
 
 import userfunctions
@@ -19,6 +21,6 @@ suggest = input()
 if suggest.lower() == 'y':
     suggest = True
 else:
-    sugest = False
+    suggest = False
 
 userfunctions.interactive_solve(suggest=suggest)

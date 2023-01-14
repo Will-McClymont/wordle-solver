@@ -303,7 +303,7 @@ class WordleSolver():
             be the correct word.
         '''
 
-        # Score number of words in which each letter appears
+        # Count number of viable words in which each letter appears
 
         wordlist_binary_letters = np.where(self.wordlist_num_letters > 0, 1, 0)
         letter_freq_list = np.sum(wordlist_binary_letters, axis=0, dtype=float)
@@ -314,13 +314,15 @@ class WordleSolver():
 
         # Score the wordlist by multiplying each of its letters by their
         # frequency. Double letters are only counted once.
-        master_wordlist_binary_letters = np.where(
-            self.master_wordlist_num_letters > 0, 1, 0)
+        # This is done for both the viable and the master wordlists.
 
         wordlist_scores = np.sum(
             wordlist_binary_letters * letter_freq_list, axis=1)
         highest_scoring_index = np.argmax(wordlist_scores)
         highest_scoring = wordlist_scores[highest_scoring_index]
+
+        master_wordlist_binary_letters = np.where(
+            self.master_wordlist_num_letters > 0, 1, 0)
 
         master_wordlist_scores = np.sum(
             master_wordlist_binary_letters * letter_freq_list, axis=1)
@@ -328,6 +330,9 @@ class WordleSolver():
         highest_scoring_master = \
             master_wordlist_scores[highest_scoring_master_index]
 
+        # Force to choose from the viable wordlist if required,
+        # Otherwise choose from master unless a viable word has
+        # a very close score.
         if force_viable:
             return self.viable_wordlist[highest_scoring_index]
         elif not force_viable:
@@ -338,7 +343,7 @@ class WordleSolver():
     def suggest_default_first_guess(self):
         '''
         Suggest a default first guess. This is a word that is known to
-        be good at eliminating many possibilities, and likley better than
-        the guess suggested by suggest_eliminator_guess.
+        be good at eliminating many possibilities, and better than
+        the first guess suggested by suggest_eliminator_guess.
         '''
         return 'salet'
