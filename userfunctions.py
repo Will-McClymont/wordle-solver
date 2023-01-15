@@ -177,7 +177,7 @@ def interactive_solve(true_word=None, suggest=True):
                 success = solver_instance.process_guess(guess)
                 valid_guess = True
             except ValueError:
-                print('Guess was not a valid five letter word that appears in'
+                print('Guess was not a valid five letter word that appears in '
                       'the Wordle dictionary.')
         if suggest and not success:
             suggested_guess = solver_instance.suggest_eliminator_guess()
