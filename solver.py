@@ -39,6 +39,7 @@ class WordleSolver():
         self.viable_wordlist = self.master_wordlist[:]
         self.suppress_info = suppress_info
 
+        # Initialise important attributes.
         self.num_attempts = 0
         self.known_letters = ['*', '*', '*', '*', '*']
         self.known_falseletters = [[], [], [], [], []]
